@@ -1,12 +1,15 @@
 import re
 
+
 from telebot.types import Message
 
 from core.config import STOP_WORDS
 from core.loader import bot
-from utils.debug import info
+from utils.api import get_weather
 
 import re
+
+
 def is_stop_word(text: str) -> bool:
     for word in STOP_WORDS:
         if word in re.findall(word, text):
@@ -21,11 +24,13 @@ def handle_message(message: Message):
 
     if is_stop_word(mess):
         bot.send_message(message.chat.id, 'Нельзя материться')
-    elif re.search(r'коп', mess):
-        bot.send_message(message.chat.id, 'Мм?')
-    elif re.search(r'пук', mess):
+    elif re.search(r'коп', mess) and re.search(r'погода', mess):
+        temperature = get_weather()
+        text = f'В Москве сейчас {temperature} ℃'
+        bot.send_message(message.chat.id, text)
+    elif re.search(r'^пук$', mess):
         bot.send_message(message.chat.id, 'Пик')
-    elif re.search(r'пик', mess):
+    elif re.search(r'^пик$', mess):
         bot.send_message(message.chat.id, 'Пук')
 
 # Эхо хендлер, куда летят текстовые сообщения без указанного состояния
